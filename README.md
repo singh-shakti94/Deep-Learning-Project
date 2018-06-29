@@ -1,2 +1,17 @@
-# Deep-Learning-Project
-A Deep learning project that solves the problem of classification of given satellite images as iceberg or a ship.
+# A Ship or an Iceberg?
+### Project Description
+The aim of this project is to buid a classifier that can identify if a remotely sensed target is a Ship or a drifting Iceberg. This is an attempt to solve the problem stated in one of the competitions at Kaggle.com ([here](https://www.kaggle.com/c/statoil-iceberg-classifier-challenge)).
+### Dataset
+The dataset for this project is borrowed from its Kaggle competition page (link to dataset [here](https://www.kaggle.com/c/statoil-iceberg-classifier-challenge/data))
+
+The data is provided in .json format (train.json and test.json). The files consist of a list of images and for each image the following fields
+* **id**: id of the image
+* **band_2, band_2**: flattened image data. each band list consist of 5627 elements corresponding to 75x75 pixel values. (true meaning of these values still need to be understood [[satellite imagery](https://www.kaggle.com/c/statoil-iceberg-classifier-challenge#Background)]).
+* **inc_angle**: inclination angle at which the image was taken.
+* **is_iceberg**: this field exists only in train.json which if set to 1 indicates that the image is an iceberg, and 0 if its is a ship.
+### Milestones
+to be decided yet
+### Work Log
+coming soon
+### References
+- Background on Satellite imaging https://www.kaggle.com/c/statoil-iceberg-classifier-challenge#Background
