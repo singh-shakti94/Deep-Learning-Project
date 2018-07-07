@@ -17,7 +17,9 @@ In order to work for this project, Some milestones have been agreed upon to mark
 - **August 2nd 2018** The finilaization of both the processes (Simple Classifier and pre-trained network) will be done and we will be ready to present our work.
 
 ### Work Log
-- **july 6th 2018** **Shakti** working on the backgroud of Satellite Imagery (will be updating the links soon)
+* **july 6th 2018** **Shakti** working on the backgroud of Satellite Imagery
+  * Synthetic-aperture Radar (SAR) [Wiwkipedia link](https://en.wikipedia.org/wiki/Synthetic-aperture_radar)
+  * Deep Learning for Target Classification from SAR Imagery [link to paper](https://arxiv.org/pdf/1708.07920.pdf)
 
 ### References
 - Background on Satellite imaging https://www.kaggle.com/c/statoil-iceberg-classifier-challenge#Background
