@@ -14,7 +14,9 @@ for i in range(2):
     b1 = b1.reshape([75, 75])
     b2 = b2.reshape([75, 75])
     print(b1.shape)
-    plt.imshow(b1)
+    plt.imshow(b1, cmap="inferno")
     plt.show()
-    plt.imshow(b2)
+    plt.imshow(b2, cmap="inferno")
     plt.show()
+
+len(data)
