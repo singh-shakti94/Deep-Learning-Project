@@ -25,11 +25,11 @@ In order to work for this project, Some milestones have been agreed upon to mark
   * Output : one-hot vector of predicted class (shape = batch_size x 2) 
   * Convolution layers :
 
-    | Layer Index | inputs | outputs| filter shape | stride | pooling-stride | activation | 
-    | ----------- |:------:| ------:| ------------:| ------:| --------------:| ----------:|
-    |      1      | 1      |  32    |     5x5      |   1    | max pooling - 2|   ReLU     |
-    |      2      | 32     |  64    |     5x5      |   1    | max pooling - 2|   ReLU     |
-    |      3      | 64     |  128   |     5x5      |   1    | max pooling - 2|   ReLU     |
+    | Layer Index |   inputs    |   outputs   | filter shape | stride | pooling-stride | activation | 
+    | ----------- |:-----------:| -----------:| ------------:| ------:| --------------:| ----------:|
+    |      1      | -1x75x75x1  | -1x38x38x32 |     5x5      |   1    | max pooling - 2|   ReLU     |
+    |      2      | -1x38x38x32 | -1x19x19x64 |     5x5      |   1    | max pooling - 2|   ReLU     |
+    |      3      | -1x19x19x64 | -1x10x10x128|     5x5      |   1    | max pooling - 2|   ReLU     |
   * Fully connected layer :
     * number of nodes : 1024
     * input : 10 x 10 x 128 (reshaped to ? X 1024)
