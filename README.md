@@ -20,6 +20,22 @@ In order to work for this project, Some milestones have been agreed upon to mark
 * **july 6th 2018** **Shakti** working on the backgroud of Satellite Imagery
   * Synthetic-aperture Radar (SAR) [Wiwkipedia link](https://en.wikipedia.org/wiki/Synthetic-aperture_radar)
   * Deep Learning for Target Classification from SAR Imagery [link to paper](https://arxiv.org/pdf/1708.07920.pdf)
+* **july 13th 2018** A simple convolution neural network is has been created. We are using 3 convolution layers and a fully connected layer to get predictions. the details for network are listed below :
+  * Input : flattened data points (shape = batch_size x 5625) of 75 x 75 images 
+  * Output : one-hot vector of predicted class (shape = batch_size x 2) 
+  * Convolution layers :
+
+    | Layer Index | inputs | outputs| filter shape | stride | pooling-stride | activation | 
+    | ----------- |:------:| ------:| ------------:| ------:| --------------:| ----------:|
+    |      1      | 1      |  32    |     5x5      |   1    | max pooling - 2|   ReLU     |
+    |      2      | 32     |  64    |     5x5      |   1    | max pooling - 2|   ReLU     |
+    |      3      | 64     |  128   |     5x5      |   1    | max pooling - 2|   ReLU     |
+  * Fully connected layer :
+    * number of nodes : 1024
+    * input : 10 x 10 x 128 (reshaped to ? X 1024)
+    * output size : batch_size x 1024
+    * activation : ReLU
+  * An attempt to apply dropout is being done (more work on it comming soon)
 
 ### References
 - Background on Satellite imaging https://www.kaggle.com/c/statoil-iceberg-classifier-challenge#Background
