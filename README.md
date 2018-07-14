@@ -17,12 +17,14 @@ In order to work for this project, Some milestones have been agreed upon to mark
 - **August 2nd 2018** The finilaization of both the processes (Simple Classifier and pre-trained network) will be done and we will be ready to present our work.
 
 ### Work Log
-* **july 6th 2018** **Shakti** working on the backgroud of Satellite Imagery
+* **july 6th 2018** **Shakti and Nikhil** working on the backgroud of Satellite Imagery
   * Synthetic-aperture Radar (SAR) [Wiwkipedia link](https://en.wikipedia.org/wiki/Synthetic-aperture_radar)
   * Deep Learning for Target Classification from SAR Imagery [link to paper](https://arxiv.org/pdf/1708.07920.pdf)
+  
 * **july 13th 2018** A simple convolution neural network is has been created. We are using 3 convolution layers and a fully connected layer to get predictions. the details for network are listed below :
   * Input : flattened data points (shape = batch_size x 5625) of 75 x 75 images 
   * Output : one-hot vector of predicted class (shape = batch_size x 2) 
+  Please refer file CNN.py for the code.
   * Convolution layers :
 
     | Layer Index |   inputs    |   outputs   | filter shape | stride | pooling-stride | activation | 
@@ -36,6 +38,9 @@ In order to work for this project, Some milestones have been agreed upon to mark
     * output size : batch_size x 1024
     * activation : ReLU
   * An attempt to apply dropout is being done (more work on it comming soon)
-
+* **july 14th 2018** A simple 3D convolution neural network is been created. We are using 1 convolution layers and a fully connected layer to get predictions. the details for input and output for network are listed below :
+  * Input : flattened data points (shape = batch_size x 16875) of 75 x 75 x 3 images 
+  * Output : one-hot vector of predicted class (shape = batch_size x 2) 
+  Please refer file CNN3D.py for the code.
 ### References
 - Background on Satellite imaging https://www.kaggle.com/c/statoil-iceberg-classifier-challenge#Background
