@@ -5,7 +5,7 @@ data1 = pd.read_json("train.json")
 
 width=75
 height=75
-depth=3
+depth=2
 epochs=1
 batch_size=1
 nLabel=2
@@ -13,7 +13,7 @@ nLabel=2
 data2 = pd.read_json("train.json")
 X_band_1=np.array([np.array(band).astype(np.float32).reshape(75, 75) for band in data2["band_1"]])
 X_band_2=np.array([np.array(band).astype(np.float32).reshape(75, 75) for band in data2["band_2"]])
-train_data = np.concatenate([X_band_1[:, :, :, np.newaxis], X_band_2[:, :, :, np.newaxis],((X_band_1+X_band_2)/2)[:, :, :, np.newaxis]], axis=-1)
+train_data = np.concatenate([X_band_1[:, :, :, np.newaxis], X_band_2[:, :, :, np.newaxis]], axis=-1)
 train_targets=np.array(data2["is_iceberg"]).reshape([-1,1])
 print train_targets.shape
 print train_data.shape
@@ -28,7 +28,7 @@ class CNN_3D:
     W_conv1 = self._weight_variable([1, 3, 3, 1, 32])
     b_conv1 = self._bias_variable([32])
 
-    W_fc = self._weight_variable([92416, 1024])
+    W_fc = self._weight_variable([46208, 1024])
     b_fc = self._bias_variable([1024])
 
     W_out = self._weight_variable([1024, nLabel])
@@ -43,7 +43,7 @@ class CNN_3D:
     print(h_conv1.get_shape)
     h_pool1 = self.max_pool_2x2(h_conv1)
     print(h_pool1.get_shape)
-    fc = tf.reshape(h_pool1, [-1, 92416])
+    fc = tf.reshape(h_pool1, [-1, 46208])
     fc = tf.nn.relu(tf.matmul(fc, W_fc) + b_fc)
 
     logits = tf.matmul(fc, W_out) + b_out
