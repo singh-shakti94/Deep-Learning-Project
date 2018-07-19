@@ -48,7 +48,8 @@ In order to work for this project, Some milestones have been agreed upon to mark
   * One more thing that I am working on is to add more images to the trainig dataset. I have gone through several data augmentation techniques that we can apply to availabel images in order to generate new images. these techniques include :
      * Rotation of image around its centre
      * zoomed crop of an image (since the objects are centered in all the images). may be take a 50x50 or 60x60 center crop of some images
-     It would be helpful to increase the dataset to better train the network.
+  
+  It would be helpful to increase the dataset to better train the network.
   * stats on training results will be updated soon.
 ### References
 - Background on Satellite imaging https://www.kaggle.com/c/statoil-iceberg-classifier-challenge#Background
