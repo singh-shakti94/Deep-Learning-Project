@@ -51,5 +51,7 @@ In order to work for this project, Some milestones have been agreed upon to mark
   
   It would be helpful to increase the dataset to better train the network.
   * stats on training results will be updated soon.
+
+* **july 20th 2018** In order to increase our samples we tried data augmentation on our training images. We tried flipping it horizontally, vertically, rotating it 90 degrees and shifting the image and created more data in order to increase size of our training dataset. The code for data augmentation is given in DataAugmentation.py file. We have also forked one keras submission of CNN for the same project and tried running it in order to compare the performance of our model with it. 
 ### References
 - Background on Satellite imaging https://www.kaggle.com/c/statoil-iceberg-classifier-challenge#Background
