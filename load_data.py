@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 with open("train.json") as f:
     data = json.load(f)
 
+data
 # plot several examples
 for i in range(2):
     b1 = np.array(data[i]["band_1"])

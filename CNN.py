@@ -39,7 +39,6 @@ class CNN:
         for each convolution layer, we are using a 5x5 filter with stride 1 on every dimension.
         ReLU activation is used after each convolution layer operation.
         after convolution layers, a fully connected layer of 1024 units is used to compute logits
-
         """
         self.weights = {
             # 5x5 conv, 1 input, 32 outputs

@@ -15,9 +15,9 @@ X_band_1=np.array([np.array(band).astype(np.float32).reshape(75, 75) for band in
 X_band_2=np.array([np.array(band).astype(np.float32).reshape(75, 75) for band in data2["band_2"]])
 train_data = np.concatenate([X_band_1[:, :, :, np.newaxis], X_band_2[:, :, :, np.newaxis]], axis=-1)
 train_targets=np.array(data2["is_iceberg"]).reshape([-1,1])
-print train_targets.shape
-print train_data.shape
-print train_data[0].shape
+print(train_targets.shape)
+print(train_data.shape)
+print(train_data[0].shape)
 
 class CNN_3D:
   def __init__(self):
@@ -69,7 +69,7 @@ class CNN_3D:
     return tf.Variable(initial)
 
   def conv3d(self,x, W):
-    return tf.nn.conv3d(x, W, strides=[1, 1, 1, 1, 1], padding='SAME') # conv2d, [1, 1, 1, 1]
+    return tf.nn.conv3d(x, W, strides=[1, 1, 1, 1, 1], padding='SAME') # conv3d, [1, 1, 1, 1]
 
   # Pooling: max pooling over 2x2 blocks
   def max_pool_2x2(self,x):  # tf.nn.max_pool. ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1]
@@ -92,7 +92,7 @@ class CNN_3D:
                            feed_dict={self.input: datum, self.expected: target})
 
         cost_epoch += cost
-        print cost_epoch
+        print(cost_epoch)
 
 c=CNN_3D()
 c.train(train_data,train_targets)
