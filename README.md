@@ -50,8 +50,31 @@ In order to work for this project, Some milestones have been agreed upon to mark
      * zoomed crop of an image (since the objects are centered in all the images). may be take a 50x50 or 60x60 center crop of some images
   
   It would be helpful to increase the dataset to better train the network.
-  * stats on training results will be updated soon.
 
 * **july 20th 2018** In order to increase our samples we tried data augmentation on our training images. We tried flipping it horizontally, vertically, rotating it 90 degrees and shifting the image and created more data in order to increase size of our training dataset. The code for data augmentation is given in DataAugmentation.py file. We have also forked one keras submission of CNN for the same project and tried running it in order to compare the performance of our model with it. 
+
+* **july 25th 2018** The tensorflow CNN implementation that we were working on is finally giving us some acceptable accuracy that we can look upon to. The configutation of the model is shared below.
+  * Convolution layers followed by max-pooling:
+
+    | Layer Index |   inputs     |   outputs    | filter shape | stride | pooling-stride | activation | 
+    | ----------- |:-----------: | -----------: | ------------:| ------:| --------------:| ----------:|
+    |      1      | -1x75x75x1   | -1x38x38x64  |     3x3      |   1    | max pooling - 2|   ReLU     |
+    |      2      | -1x38x38x64  | -1x19x19x128 |     3x3      |   1    | max pooling - 2|   ReLU     |
+    |      3      | -1x19x19x128 | -1x10x10x256 |     3x3      |   1    | max pooling - 2|   ReLU     |
+  * Fully connected layer :
+    * number of nodes : 512
+    * input : 10 x 10 x 256 (reshaped to ? X 512)
+    * output size : batch_size x 512
+    * activation : ReLU
+  * output layer :
+    * 512 inputs and 2 outputs (class probabilities)
+  * The above mentioned model was run for 3 epochs with a batch size of 2 and the log loss for has come down to ~2.0. The labelled trainig dataset having ~1600 images was divided inti test and train datasets (keeping 90% for training and 10% for testing). we were able to achieve ~75% accuracy on this model. Keeping in mind that no data augmentation technique is applied to this point, this accuracy seems fair.
+  * Although we managed to get this accuracy, the loss was going up and down throughout the trainig process (may be a case of oscillations), we are currently looking into it and will be updating insights soon.
+  * work is in progress for applying regularization (L2) on this model and trainng on augmented dataset will be carried on soon and the results will be reported soon.
+* An extensive exploration of the images in the dataset is being done in data_exploartion.ipynb notebook. through visualizing some random samples of both classes, we were trying to find out that if the two classes are visually separable. we found out that although some images are vuisually seperable, we cannot generalize anything. Moreover, the band_2 is very noisy in a lot of cases, we came up with a third channel (band_1 + band_2) that has proved to be very effective in eliminating the noise.(visualized in the notebook)
+* I (Shakti) am also working on trainig a pretrained VGG model (details will be updated soon)
+* For next week, I will be working on VGG model and making changes to out CNN implementation, while Nikhil will be working on Feature extraction and Baseline model on Keras.
 ### References
 - Background on Satellite imaging https://www.kaggle.com/c/statoil-iceberg-classifier-challenge#Background
+- Inspiration of Data Augmentation is taken from https://machinelearningmastery.com/image-augmentation-deep-learning-keras/ but we implemented it using numpy methods unlike keras implementation mentioned in the above link.
+ 
