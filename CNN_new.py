@@ -4,29 +4,34 @@ import pandas as pd
 import numpy as np
 
 # Import the data
-data = pd.read_json("train.json")
+# data_ = pd.read_json("train.json")
 
+# import augmented data
+data = np.load("aug_data.npy")
+np.random.shuffle(data)
 # training data (for now using only band_1 for convolution)
 # labels are in "is_iceberg" column where 0 value indicates a ship while 1 indicates iceberg
-X_band_1 = np.array([np.array(band).astype(np.float32).reshape(75, 75) for band in data["band_1"]])
-X_band_2 = np.array([np.array(band).astype(np.float32).reshape(75, 75) for band in data["band_2"]])
-channel_3 = X_band_1 + X_band_2
-train_data = np.concatenate([X_band_1[:, :, :, np.newaxis],
-                             X_band_2[:, :, :, np.newaxis],
-                             channel_3[:, :, :, np.newaxis]], axis=-1)
-split = np.array_split(train_data, 10, axis=0)
-train_data = np.concatenate(split[0:9], axis=0)
-test_data = split[9]
+# X_band_1 = np.array([np.array(band).astype(np.float32).reshape(75, 75) for band in data_["band_1"]])
+# X_band_2 = np.array([np.array(band).astype(np.float32).reshape(75, 75) for band in data_["band_2"]])
+# channel_3 = X_band_1 + X_band_2
+# train_data = np.concatenate([X_band_1[:, :, :, np.newaxis],
+#                              X_band_2[:, :, :, np.newaxis],
+#                              channel_3[:, :, :, np.newaxis]], axis=-1)
+targets = data[:, 1]
+data = np.stack(data[:, 0], axis=0)
+split = np.array_split(data, 10, axis=0)
+train_data = np.concatenate(split[0:7], axis=0)
+test_data = np.concatenate(split[7:10], axis=0)
+
 # converting labels to one-hot vector
-train_targets = data["is_iceberg"]
-b = np.zeros((1604, 2))
-b[np.arange(1604), list(train_targets)] = 1
-train_targets = np.concatenate(np.array_split(b, 10, axis=0)[0:9], axis=0)
-test_targets = np.array_split(b, 10, axis=0)[9]
+b = np.zeros((8020, 2))
+b[np.arange(8020), list(targets)] = 1
+train_targets = np.concatenate(np.array_split(b, 10, axis=0)[0:7], axis=0)
+test_targets = np.concatenate(np.array_split(b, 10, axis=0)[7:10], axis=0)
 
 # Training Parameters
 learning_rate = 0.001
-batch_size = 10
+# batch_size = 10
 
 # Network Parameters
 num_input = 5625 * 3  # flattened data input (input shape: 75*75*3)
@@ -57,9 +62,9 @@ class CNN:
             'wc2': tf.Variable(tf.random_normal([3, 3, 64, 128])),
             # 5x5 conv, 64 inputs, 128 outputs
             'wc3': tf.Variable(tf.random_normal([3, 3, 128, 256])),
-            # fully connected, 8*8*128 inputs, 1024 outputs
+            # fully connected, 8*8*128 inputs, 512 outputs
             'wd1': tf.Variable(tf.random_normal([10 * 10 * 256, 512])),
-            # 1024 inputs, 2 outputs (class prediction)
+            # 512 inputs, 2 outputs (class prediction)
             'out': tf.Variable(tf.random_normal([512, num_classes]))
         }
 
@@ -73,7 +78,7 @@ class CNN:
 
         # Construct compute graph
         logits = self.conv_net(self.X, self.weights, self.biases, self.keep_prob)
-        prediction = tf.nn.softmax(logits)
+        self.prediction = tf.nn.softmax(logits)
 
         # Define loss and optimizer
         self.loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
@@ -82,7 +87,7 @@ class CNN:
         self.train_op = optimizer.minimize(self.loss_op)
 
         # model evaluation
-        correct_pred = tf.equal(tf.argmax(prediction, 1), tf.argmax(self.Y, 1))
+        correct_pred = tf.equal(tf.argmax(self.prediction, 1), tf.argmax(self.Y, 1))
         self.accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
         self.session = tf.Session()
@@ -140,11 +145,12 @@ class CNN:
 
     def train(self, train_data, train_targets, batch_size=1, epochs=1):
         sess = self.session
-
+        saver = tf.train.Saver()
         print("training started ...")
         batch = 0
         test_datum = [test_data.flatten().transpose() for test_data in test_data]
         for epoch in range(epochs):
+            print("\n\nepoch : %d"%epoch)
             for datum, target in zip([train_data[i:i + batch_size] for i in range(0, len(train_data), batch_size)],
                                      [train_targets[i:i + batch_size] for i in
                                       range(0, len(train_targets), batch_size)]):
@@ -157,15 +163,21 @@ class CNN:
                 if batch % 10 == 0 or batch == 1:
                     # Calculate batch loss and accuracy
                     loss, acc = sess.run([self.loss_op, self.accuracy], feed_dict={self.X: datum,
-                                                                         self.Y: target,
-                                                                         self.keep_prob: 1.0})
-                    print("Step " + str(batch) + ", Minibatch Loss= " + \
-                          "{:.4f}".format(loss) + ", Training Accuracy= " + \
+                                                                                   self.Y: target,
+                                                                                   self.keep_prob: 1.0})
+                    log_loss = tf.losses.log_loss(labels=target, predictions=sess.run(self.prediction,
+                                                                                      feed_dict={self.X: datum,
+                                                                                                 self.Y: target,
+                                                                                                 self.keep_prob:1.0} ))
+                    print("Step " + str(batch) + ", Minibatch log Loss= " + \
+                          "%f"%(sess.run(log_loss)) + ", Training Accuracy= " + \
                           "{:.3f}".format(acc))
-                    print("\t Test accuracy : {}".format(self.test_accuracy(test_datum, test_targets)))
+                    # print("\t Test accuracy : {}".format(self.test_accuracy(test_datum, test_targets)))
 
         print("\n\noptimization complete!")
+        save_path = saver.save(sess, "saved_model/model.ckpt")
+        print("Model saved in path: %s" % save_path)
         print("\t test accuracy : {}".format(self.test_accuracy(test_datum, test_targets)))
 
 c = CNN()
-c.train(train_data, train_targets, batch_size=2, epochs=2)
+c.train(train_data, train_targets, batch_size=50, epochs=10)
