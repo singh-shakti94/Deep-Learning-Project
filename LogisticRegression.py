@@ -29,18 +29,16 @@ class Data_ANN:
         self.expected_output = tf.placeholder(dtype=tf.int32,shape=[None,1])
 
         # Initialise the weights and biases. Use zeros for the biases.
-        weights = [tf.Variable(dtype=tf.float32,initial_value=0.01*np.random.randn(8,hidden_units[0]))]
+        weights = [tf.Variable(dtype=tf.float32,initial_value=np.random.randn(8,hidden_units[0]))]
         biases = [tf.Variable(dtype=tf.float32,initial_value=np.zeros(shape=[1,hidden_units[0]]))]
 
         # Loop here.
         for i in range(len(hidden_units)-1):
             biases.append(tf.Variable(dtype=tf.float32,initial_value=np.zeros(shape=[1,hidden_units[i+1]])))
-            weights.append(tf.Variable(dtype=tf.float32,initial_value=0.01*np.random.randn(hidden_units[i],hidden_units[i+1])))
+            weights.append(tf.Variable(dtype=tf.float32,initial_value=np.random.randn(hidden_units[i],hidden_units[i+1])))
 
         biases.append(tf.Variable(dtype=tf.float32, initial_value=np.zeros(shape=[1,2])))
-        weights.append(tf.Variable(dtype=tf.float32, initial_value=0.01*np.random.randn(hidden_units[len(hidden_units)-1], 2)))
-
-
+        weights.append(tf.Variable(dtype=tf.float32, initial_value=np.random.randn(hidden_units[len(hidden_units)-1], 2)))
 
         def graph_Builder(x):
             for i in range(len(activations)):
@@ -50,15 +48,14 @@ class Data_ANN:
             return logit,pred
 
         # Build the graph for computing output.
-        self.output,self.pred=graph_Builder(self.input)
+        self.logit,self.output=graph_Builder(self.input)
 
         # # Define the loss and accuracy here. (Refer Tutorial)
-        self.cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=tf.one_hot(self.expected_output, 2), logits=self.output))
-
+        entropy = tf.nn.softmax_cross_entropy_with_logits(labels=tf.one_hot(self.expected_output, 2), logits=self.logit)
+        self.cost = tf.reduce_mean(entropy)
         correct_prediction = tf.equal(tf.reshape(tf.argmax(self.output, 1), [-1, 1]),
                                       tf.cast(self.expected_output, dtype=tf.int64))
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-        #
         # # Instantiate the optimizer
         optimizer=tf.train.AdamOptimizer()
         #
@@ -68,7 +65,7 @@ class Data_ANN:
         # # Initialize all variables
         self.init=tf.global_variables_initializer()
 
-    def train(self, train_data, train_labels, eval_data, eval_labels, batch_size, epochs=100):
+    def train(self, train_data, train_labels, eval_data, eval_labels, batch_size, epochs):
         """
         Training code.
         """
@@ -101,7 +98,7 @@ class Data_ANN:
 
         return acc
 
-ann = Data_ANN([1],[tf.nn.relu])
+ann = Data_ANN([4,5],[tf.nn.relu,tf.nn.relu])
 train_data, eval_data ,train_labels, eval_labels = train_test_split(traindata, label,
                                                         test_size=0.3)
-ann.train(train_data,train_labels,eval_data,eval_labels,batch_size=1,epochs=10)
+ann.train(train_data,train_labels,eval_data,eval_labels,batch_size=1,epochs=50)
