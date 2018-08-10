@@ -74,7 +74,25 @@ In order to work for this project, Some milestones have been agreed upon to mark
 * An extensive exploration of the images in the dataset is being done in data_exploartion.ipynb notebook. through visualizing some random samples of both classes, we were trying to find out that if the two classes are visually separable. we found out that although some images are vuisually seperable, we cannot generalize anything. Moreover, the band_2 is very noisy in a lot of cases, we came up with a third channel (band_1 + band_2) that has proved to be very effective in eliminating the noise.(visualized in the notebook)
 * I (Shakti) am also working on trainig a pretrained VGG model (details will be updated soon)
 * For next week, I will be working on VGG model and making changes to out CNN implementation, while Nikhil will be working on Feature extraction and Baseline model on Keras.
+
+* Details on pertrained VGG network : Since last week (week of 4th August), we were working on training a pre-trained VGG16 network, which we have accomplished successfully. The pretained model that is uded is built in keras with tensorflow as background. It is performing pretty well on the data (~82% accurate after training for 10 epochs with a batch size of 50 images.)
+* Since the VGG16 architecture have 16 convolution layers and the pretrained weights are of trainig of network on real world images(animals, faces, cars etc) and we are dealing with low resolution satellite images, we decided to not use the later convolution layers(after #5). So, we are using only initial 5 conviolution layers of pretarained VGG16 and then added two fully connected layers to it(relu activation).
+* We came to this above conclusion after reading at several sources on why and how to finetune pretrained networks(links in refrences).
+* Data augmentation is also applied before feeding the data to pretrained network (keras makes it so easy)
+* we set the pretained layers as non trainable and only trained the new dense layers that we added.
+* we are now experimenting with more layers on top of those initial five layers, the strategy is as follows:
+  * use 16 layers and newly added dense layers, set the 16 convolution layers as non-trainable and perform training on only the dense layers
+  * in second phase, set some later convolution layers trainable while still keeping 5 initial layers non-trainable.
+* Also, a minor rise in accuracy is experienced while training our implementation of CNN on dataset created by data augmentation.
 ### References
 - Background on Satellite imaging https://www.kaggle.com/c/statoil-iceberg-classifier-challenge#Background
 - Inspiration of Data Augmentation is taken from https://machinelearningmastery.com/image-augmentation-deep-learning-keras/ but we implemented it using numpy methods unlike keras implementation mentioned in the above link.
- 
+
+- Readings on why and How to finetune pretrained networks 
+  - https://flyyufelix.github.io/2016/10/03/fine-tuning-in-keras-part1.html
+  - https://flyyufelix.github.io/2016/10/08/fine-tuning-in-keras-part2.htm
+- Further reading on finetuning :
+  - https://machinelearningmastery.com/use-pre-trained-vgg-model-classify-objects-photographs
+  - http://cv-tricks.com/keras/fine-tuning-tensorflow/
+- VGG paper https://arxiv.org/pdf/1409.1556v6.pdf
+- paper on Salinecy maps https://arxiv.org/pdf/1610.02391v1.pdf
