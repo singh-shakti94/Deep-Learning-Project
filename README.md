@@ -96,3 +96,8 @@ In order to work for this project, Some milestones have been agreed upon to mark
   - http://cv-tricks.com/keras/fine-tuning-tensorflow/
 - VGG paper https://arxiv.org/pdf/1409.1556v6.pdf
 - paper on Salinecy maps https://arxiv.org/pdf/1610.02391v1.pdf
+
+# code files
+## resnet.py, Resnet.ipynb--RESNET Implementation
+## MultiLayerPerceptron.py-- MLP Implementation
+## KerasBaselineImplementation.py, KerasBaseline.ipynb-- Keras Baseline model
