@@ -10,9 +10,11 @@ cols = pd.read_csv('inputForLogistic', nrows=1).columns
 traindata=pd.read_csv('inputForLogistic',usecols=cols[:-1])
 label=pd.read_csv('inputForLogistic',usecols=['is_iceberg'])
 tc = pd.read_json("train.json")
-print (tc.groupby(['inc_angle']).size().nlargest(20))
+# print (tc.groupby(['inc_angle']).size().nlargest(20))
+testdata=pd.read_csv('inputForLogistictest')
+# print (testdata)
 
-
+test=pd.read_json('test.json')
 
 class Data_ANN:
     def __init__(self, hidden_units, activations):
@@ -31,31 +33,38 @@ class Data_ANN:
         self.expected_output = tf.placeholder(dtype=tf.int32,shape=[None,1])
 
         # Initialise the weights and biases. Use zeros for the biases.
-        weights = [tf.Variable(dtype=tf.float32,initial_value=np.random.randn(8,hidden_units[0]))]
-        biases = [tf.Variable(dtype=tf.float32,initial_value=np.zeros(shape=[1,hidden_units[0]]))]
+        self.weights = [tf.Variable(dtype=tf.float32,initial_value=np.random.randn(8,hidden_units[0]))]
+        self.biases = [tf.Variable(dtype=tf.float32,initial_value=np.zeros(shape=[1,hidden_units[0]]))]
 
         # Loop here.
         for i in range(len(hidden_units)-1):
-            biases.append(tf.Variable(dtype=tf.float32,initial_value=np.zeros(shape=[1,hidden_units[i+1]])))
-            weights.append(tf.Variable(dtype=tf.float32,initial_value=np.random.randn(hidden_units[i],hidden_units[i+1])))
+            self.biases.append(tf.Variable(dtype=tf.float32,initial_value=np.zeros(shape=[1,hidden_units[i+1]])))
+            self.weights.append(tf.Variable(dtype=tf.float32,initial_value=np.random.randn(hidden_units[i],hidden_units[i+1])))
 
-        biases.append(tf.Variable(dtype=tf.float32, initial_value=np.zeros(shape=[1,2])))
-        weights.append(tf.Variable(dtype=tf.float32, initial_value=np.random.randn(hidden_units[len(hidden_units)-1], 2)))
+        self.biases.append(tf.Variable(dtype=tf.float32, initial_value=np.zeros(shape=[1,2])))
+        self.weights.append(tf.Variable(dtype=tf.float32, initial_value=np.random.randn(hidden_units[len(hidden_units)-1], 2)))
 
         def graph_Builder(x):
             for i in range(len(activations)):
-                x = activations[i](tf.matmul(x, weights[i]) + biases[i])
+                x = tf.layers.batch_normalization(x)
+                x = activations[i](tf.matmul(x, self.weights[i]) + self.biases[i])
+                x = tf.nn.dropout(x, 0.5)
 
-            logit= tf.matmul(x, weights[len(activations)]) + biases[len(activations)]
+            logit= tf.matmul(x, self.weights[len(activations)]) + self.biases[len(activations)]
             pred=tf.nn.softmax(logit)
             return logit,pred
 
         # Build the graph for computing output.
         self.logit,self.output=graph_Builder(self.input)
-
-        # # Define the loss and accuracy here. (Refer Tutorial)
         entropy = tf.nn.softmax_cross_entropy_with_logits(labels=tf.one_hot(self.expected_output, 2), logits=self.logit)
         self.cost = tf.reduce_mean(entropy)
+        # Loss function with L2 Regularization with decaying learning rate beta=0.01
+        regularizers = 0
+        for weight in self.weights:
+            regularizers = regularizers + tf.nn.l2_loss(weight)
+        self.cost = tf.reduce_mean(self.cost + 0.01 * regularizers)
+        # # Define the loss and accuracy here. (Refer Tutorial)
+
         correct_prediction = tf.equal(tf.reshape(tf.argmax(self.output, 1), [-1, 1]),
                                       tf.cast(self.expected_output, dtype=tf.int64))
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
@@ -101,7 +110,26 @@ class Data_ANN:
 
         return acc
 
-ann = Data_ANN([10,10],[tf.nn.relu,tf.nn.relu])
+    def Assign_labels(self, testdata, hidden_Units, activations):
+        list=[]
+        z = tf.reshape(tf.cast(testdata, tf.float32), [len(testdata), 8])
+        for i in range(len(activations)):
+            z = activations[i](tf.matmul(z, self.weights[i]) + self.biases[i])
+
+        logit = tf.matmul(z, self.weights[len(activations)]) + self.biases[len(activations)]
+        pred = tf.nn.softmax(logit)
+        pred = tf.argmax(pred, 1)
+
+
+        submission = pd.DataFrame()
+        submission['id'] = test['id']
+        submission['is_iceberg'] = self.session.run(pred)
+        submission.to_csv('submlp.csv', index=False)
+
+
+
+ann = Data_ANN([100,200,100,200,50],[tf.nn.relu,tf.nn.relu,tf.nn.relu,tf.nn.relu,tf.nn.relu])
 train_data, eval_data ,train_labels, eval_labels = train_test_split(traindata, label,
                                                         test_size=0.3)
 ann.train(train_data,train_labels,eval_data,eval_labels,batch_size=1,epochs=50)
+ann.Assign_labels(testdata,[100,200,100,200,50],[tf.nn.relu,tf.nn.relu,tf.nn.relu,tf.nn.relu,tf.nn.relu])
